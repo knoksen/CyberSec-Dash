@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Agent } from "../types";
 import { Search } from "lucide-react";
+import { Agent } from "../types";
 
 interface FilterBarProps {
   agents: Agent[];
@@ -21,25 +21,35 @@ const FilterBar: React.FC<FilterBarProps> = ({ agents, onFilter }) => {
   onFilterRef.current = onFilter;
 
   useEffect(() => {
-    const filtered = agents.filter(
-      (a) =>
-        a.name.toLowerCase().includes(query.toLowerCase()) &&
-        (role === "All" || a.role === role) &&
-        (team === "All" || a.team === team) &&
-        (group === "All" || a.group === group) &&
-        (scope === "All" || a.scope === scope),
+    onFilterRef.current(
+      agents.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query.toLowerCase()) &&
+          (role === "All" || a.role === role) &&
+          (team === "All" || a.team === team) &&
+          (group === "All" || a.group === group) &&
+          (scope === "All" || a.scope === scope)
+      )
     );
-    onFilterRef.current(filtered);
   }, [query, role, team, group, scope, agents]);
 
-  const roles = ["All", ...Array.from(new Set(agents.map((a) => a.role)))];
-  const teams = ["All", ...Array.from(new Set(agents.map((a) => a.team)))];
-  const groups = ["All", ...Array.from(new Set(agents.map((a) => a.group)))];
+  const roles: string[] = [
+    "All",
+    ...Array.from(new Set(agents.map((a) => a.role))).map((r) => String(r)),
+  ];
+  const teams: string[] = [
+    "All",
+    ...Array.from(new Set(agents.map((a) => a.team))).map((t) => String(t)),
+  ];
+  const groups: string[] = [
+    "All",
+    ...Array.from(new Set(agents.map((a) => a.group))).map((g) => String(g)),
+  ];
 
   const renderSelect = (
     label: string,
     value: string,
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
+    onChange: (_e: React.ChangeEvent<HTMLSelectElement>) => void,
     options: string[],
   ) => (
     <div>

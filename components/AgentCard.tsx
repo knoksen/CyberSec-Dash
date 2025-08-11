@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Agent } from "../types";
 import { motion } from "framer-motion";
 import { ShieldAlert, BarChart, AlertCircle } from "lucide-react";
+import { Agent } from "../types";
 
 interface AgentCardProps {
   agent: Agent;
@@ -26,7 +26,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
   liveAlerts = 0,
   riskScore = 0,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  // const [isHovered, setIsHovered] = useState(false);
 
   const riskColor =
     riskScore > 75
@@ -42,8 +42,8 @@ const AgentCard: React.FC<AgentCardProps> = ({
         boxShadow:
           "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
       }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+  // onHoverStart={() => setIsHovered(true)}
+  // onHoverEnd={() => setIsHovered(false)}
       className="relative bg-white rounded-2xl shadow-md p-6 ring-1 ring-gray-900/5 h-full flex flex-col"
       role="group"
       aria-labelledby={`agent-${agent.id}-name`}
