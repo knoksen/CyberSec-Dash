@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { sendChat } from '../lib/chatClient';
+
+import React, { useEffect, useRef, useState } from 'react';
 
 /**
  * Chat message model
  */
+// Chat message model
 export type ChatRole = 'user' | 'ai' | 'system';
 export interface ChatMessage {
   id: string;
@@ -15,13 +16,18 @@ export interface ChatMessage {
 const LS_KEY = 'csd:chat:v1';
 
 function uuid() {
-  return (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)) as string;
+  // Simple UUID v4 polyfill
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 function useChatHistory() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === 'undefined') return [];
     try {
-      const raw = localStorage.getItem(LS_KEY);
+      const raw = window.localStorage.getItem(LS_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw) as ChatMessage[];
       return Array.isArray(parsed) ? parsed : [];
@@ -29,21 +35,24 @@ function useChatHistory() {
       return [];
     }
   });
-
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify(messages));
+      window.localStorage.setItem(LS_KEY, JSON.stringify(messages));
     } catch {
       // ignore quota
     }
   }, [messages]);
-
   const clear = () => setMessages([]);
-
   return { messages, setMessages, clear } as const;
 }
 
-export default function Chat() {
+type ChatProps = {
+  analyticsEnabled?: boolean;
+  logEvent?: (...args: any[]) => void;
+};
+
+const Chat: React.FC<ChatProps> = ({ analyticsEnabled, logEvent }) => {
   const { messages, setMessages, clear } = useChatHistory();
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -54,29 +63,37 @@ export default function Chat() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
-  const canSend = useMemo(() => input.trim().length > 0 && !busy, [input, busy]);
+  const canSend = input.trim().length > 0 && !busy;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSend) return;
-
-    const userMsg: ChatMessage = { id: uuid(), role: 'user', text: input.trim(), createdAt: Date.now() };
-    setMessages(prev => [...prev, userMsg]);
     setBusy(true);
-
+    const inputText = input.trim();
+    const history = messages.map(m => ({
+      role: m.role === 'ai' ? 'model' : m.role,
+      content: m.text,
+    }));
+    if (analyticsEnabled && logEvent) logEvent('chat_send', { text: inputText });
     try {
-      const reply = await sendChat(userMsg.text);
-      const aiMsg: ChatMessage = { id: uuid(), role: 'ai', text: reply, createdAt: Date.now() };
-      setMessages(prev => [...prev, aiMsg]);
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...history, { role: 'user', content: inputText }] }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const reply = (await res.json()) as { role: 'model'; content: string };
+      setMessages(h => [
+        ...h,
+        { id: uuid(), role: 'user', text: inputText, createdAt: Date.now() },
+        { ...reply, id: uuid(), role: 'ai', text: reply.content, createdAt: Date.now() },
+      ]);
       setInput('');
     } catch (err: any) {
-      const aiMsg: ChatMessage = {
-        id: uuid(),
-        role: 'system',
-        text: `Error: ${err?.message ?? 'Unknown error'}`,
-        createdAt: Date.now(),
-      };
-      setMessages(prev => [...prev, aiMsg]);
+      setMessages(h => [
+        ...h,
+        { id: uuid(), role: 'system', text: `Error: ${err?.message ?? 'Unknown error'}`, createdAt: Date.now() },
+      ]);
     } finally {
       setBusy(false);
       inputRef.current?.focus();
@@ -86,14 +103,16 @@ export default function Chat() {
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      // submit via form
       (e.currentTarget.form as HTMLFormElement | undefined)?.requestSubmit();
     }
   }
 
   async function copyLast() {
     const last = [...messages].reverse().find(m => m.role !== 'system');
-    if (last) await navigator.clipboard.writeText(last.text);
+    if (last) {
+      await navigator.clipboard.writeText(last.text);
+      if (analyticsEnabled && logEvent) logEvent('chat_copy_last');
+    }
   }
 
   function exportJson() {
@@ -105,6 +124,7 @@ export default function Chat() {
     a.download = `chat-${ts}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    if (analyticsEnabled && logEvent) logEvent('chat_export');
   }
 
   return (
@@ -124,6 +144,7 @@ export default function Chat() {
             onClick={copyLast}
             disabled={messages.length === 0}
             title="Copy last message"
+            aria-label="Copy last assistant message"
           >
             Copy last
           </button>
@@ -134,6 +155,7 @@ export default function Chat() {
             onClick={exportJson}
             disabled={messages.length === 0}
             title="Export chat as JSON"
+            aria-label="Export chat as JSON"
           >
             Export
           </button>
@@ -143,6 +165,7 @@ export default function Chat() {
             className="px-3 py-1.5 border rounded-lg text-sm text-red-700 border-red-300 hover:bg-red-50"
             onClick={clear}
             title="Clear chat history"
+            aria-label="Clear chat history"
           >
             Clear
           </button>
@@ -155,13 +178,15 @@ export default function Chat() {
         className="min-h-[240px] max-h-[50vh] overflow-y-auto flex flex-col gap-3 pr-1"
         aria-live="polite"
         aria-relevant="additions"
+        tabIndex={0}
       >
         {messages.length === 0 && (
           <div className="text-sm text-neutral-500">Ask anything about the dashboard, security posture, or risks.</div>
         )}
-
         {messages.map((m) => (
-          <MessageBubble key={m.id} msg={m} />
+          <div key={m.id}>
+            <MessageBubble msg={m} />
+          </div>
         ))}
         <div ref={endRef} />
       </div>
@@ -178,19 +203,20 @@ export default function Chat() {
           onKeyDown={handleKeyDown}
           aria-label="Chat input"
         />
-        <button
-          type="submit"
-          data-testid="send-btn"
-          className="px-4 py-2 rounded-xl border bg-blue-600 text-white disabled:opacity-50"
-          disabled={!canSend}
-          aria-busy={busy}
-        >
-          {busy ? 'Sending…' : 'Send'}
-        </button>
+         <button
+           type="submit"
+           data-testid="send-btn"
+           className="px-4 py-2 rounded-xl border bg-blue-600 text-white disabled:opacity-50"
+           disabled={!canSend}
+           aria-busy={busy}
+           aria-label={busy ? 'Sending message' : 'Send message'}
+         >
+           {busy ? 'Sending…' : 'Send'}
+         </button>
       </form>
     </section>
   );
-}
+};
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user';
@@ -214,3 +240,5 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
     </div>
   );
 }
+
+export default Chat;

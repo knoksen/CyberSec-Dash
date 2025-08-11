@@ -1,0 +1,6 @@
+{
+    "IsEncrypted": false,
+    "Values": {
+        "GEMINI_API_KEY": "your-local-gemini-api-key-here"
+    }
+}

@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  app:
+    image: node:20
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: bash -lc "if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm i; elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile; elif [ -f package-lock.json ]; then npm ci; else npm i; fi; if jq -e .scripts.dev package.json >/dev/null 2>&1; then npm run dev -- --host 0.0.0.0; elif jq -e .scripts.start package.json >/dev/null 2>&1; then npm start; else node server.js; fi"
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+      - "4173:4173"

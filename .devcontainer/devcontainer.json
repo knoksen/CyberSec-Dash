@@ -1,23 +1,40 @@
 {
-    "name": "CyberSec-Dash",
-    "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
-    "features": {
-        "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/node:1": {
-            "version": "20"
+    "name": "One‑Click Run Dev",
+    "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+    "remoteUser": "node",
+    "updateContentCommand": "bash -lc 'if [ -f pnpm-lock.yaml ]; then corepack enable && pnpm i; elif [ -f yarn.lock ]; then corepack enable && yarn install --frozen-lockfile; elif [ -f package-lock.json ]; then npm ci; else npm i; fi'",
+    "postStartCommand": "bash -lc 'if [ -f package.json ]; then if jq -e .scripts.dev package.json >/dev/null 2>&1; then npm run dev -- --host 0.0.0.0; elif jq -e .scripts.start package.json >/dev/null 2>&1; then npm start; else echo \"No dev/start script found in package.json\"; fi; fi'",
+    "forwardPorts": [
+        5173,
+        3000,
+        4173
+    ],
+    "portsAttributes": {
+        "5173": {
+            "label": "Vite Dev Server",
+            "onAutoForward": "openBrowser"
+        },
+        "3000": {
+            "label": "Web App",
+            "onAutoForward": "openBrowser"
+        },
+        "4173": {
+            "label": "Vite Preview",
+            "onAutoForward": "openBrowser"
         }
     },
-    "postCreateCommand": "npm ci && npx playwright install --with-deps",
     "customizations": {
         "vscode": {
             "extensions": [
+                "ms-vscode.vscode-typescript-next",
                 "esbenp.prettier-vscode",
                 "dbaeumer.vscode-eslint",
                 "bradlc.vscode-tailwindcss"
-            ]
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "files.eol": "\n"
+            }
         }
-    },
-    "forwardPorts": [
-        5173
-    ]
+    }
 }
