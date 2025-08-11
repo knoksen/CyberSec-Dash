@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchAgents, addAgents, scaleAgents, type Agent } from "@/lib/api";
 import { PaginatedGrid } from "@/components/PaginatedGrid";
 
@@ -20,7 +20,7 @@ export default function App() {
     }
   }
 
-  useEffect(() => { load(); }, [query]);
+  useEffect(() => { load(); }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="p-6 space-y-4">
