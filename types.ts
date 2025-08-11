@@ -1,6 +1,6 @@
 export interface AgentAlert {
   id: number;
-  severity: 'Critical' | 'High' | 'Medium' | 'Low';
+  severity: "Critical" | "High" | "Medium" | "Low";
   message: string;
 }
 
@@ -10,14 +10,14 @@ export interface Agent {
   role: string;
   team: string;
   group: string;
-  scope: 'local' | 'international';
+  scope: "local" | "international";
   avatar: string;
   alerts: AgentAlert[];
 }
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'model';
+  role: "user" | "model";
   content: string;
   streaming?: boolean;
 }

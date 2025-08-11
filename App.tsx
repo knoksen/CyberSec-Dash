@@ -1,12 +1,11 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
-import Layout from './components/Layout';
-import Hero from './components/Hero';
-import FilterBar from './components/FilterBar';
-import AgentGrid from './components/AgentGrid';
-import AiChat from './components/Chat';
-import { AGENTS } from './constants';
-import { Agent } from './types';
+import React, { useState, useEffect, useCallback } from "react";
+import Layout from "./components/Layout";
+import Hero from "./components/Hero";
+import FilterBar from "./components/FilterBar";
+import AgentGrid from "./components/AgentGrid";
+import AiChat from "./components/Chat";
+import { AGENTS } from "./constants";
+import { Agent } from "./types";
 
 const App: React.FC = () => {
   const [filteredAgents, setFilteredAgents] = useState<Agent[]>(AGENTS);
@@ -16,16 +15,17 @@ const App: React.FC = () => {
   useEffect(() => {
     // Simulate fetching risk scores on mount
     const newRiskScores: Record<number, number> = {};
-    AGENTS.forEach(agent => {
+    AGENTS.forEach((agent) => {
       newRiskScores[agent.id] = Math.floor(Math.random() * 80) + 10; // Random score 10-90
     });
     setRiskScores(newRiskScores);
 
     // Simulate polling for live alerts
     const intervalId = setInterval(() => {
-      setLiveStatus(prevStatus => {
+      setLiveStatus((prevStatus) => {
         const newStatus = { ...prevStatus };
-        const randomAgentId = AGENTS[Math.floor(Math.random() * AGENTS.length)].id;
+        const randomAgentId =
+          AGENTS[Math.floor(Math.random() * AGENTS.length)].id;
         newStatus[randomAgentId] = (newStatus[randomAgentId] || 0) + 1;
         return newStatus;
       });
@@ -33,9 +33,9 @@ const App: React.FC = () => {
 
     return () => clearInterval(intervalId);
   }, []);
-  
+
   const handleFilter = useCallback((filtered: Agent[]) => {
-      setFilteredAgents(filtered);
+    setFilteredAgents(filtered);
   }, []);
 
   return (
@@ -47,19 +47,24 @@ const App: React.FC = () => {
             <FilterBar agents={AGENTS} onFilter={handleFilter} />
           </aside>
           <main className="lg:col-span-9">
-            <AgentGrid agents={filteredAgents} liveStatus={liveStatus} riskScores={riskScores} />
+            <AgentGrid
+              agents={filteredAgents}
+              liveStatus={liveStatus}
+              riskScores={riskScores}
+            />
           </main>
         </div>
       </section>
       <section id="chat" className="container mx-auto px-4 sm:px-6 pb-8">
         <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Ask your AI Agent</h2>
-            <AiChat />
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Ask your AI Agent
+          </h2>
+          <AiChat />
         </div>
       </section>
     </Layout>
   );
 };
-
 
 export default App;
