@@ -1,0 +1,6 @@
+{
+  "name": "Cyber Agents Dashboard",
+  "description": "An interactive dashboard to manage and monitor AI-powered cybersecurity agents, featuring real-time data, filtering, and an integrated AI chat assistant.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
