@@ -1,99 +1,47 @@
-import React, { Suspense, useState, useEffect, useCallback } from "react";
-import Layout from "./components/Layout";
-import Hero from "./components/Hero";
-import FilterBar from "./components/FilterBar";
-import AgentGrid from "./components/AgentGrid";
-const AiChat = React.lazy(() => import("./components/Chat"));
-import { AGENTS } from "./constants";
-import { Agent } from "./types";
 
 
-// Minimal analytics event logger
-const logEvent = (event: string, data?: any) => {
-  if (window.localStorage.getItem("analytics-enabled") === "true") {
-    console.log("[Analytics]", event, data || "");
+import React, { useEffect, useState, useMemo } from "react";
+import { fetchAgents, addAgents, scaleAgents, type Agent } from "@/lib/api";
+import { PaginatedGrid } from "@/components/PaginatedGrid";
+
+export default function App() {
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Agent | null>(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { items } = await fetchAgents(query ? { q: query } : undefined);
+      setAgents(items);
+    } finally {
+      setLoading(false);
+    }
   }
-};
 
-const App: React.FC = () => {
-  const [filteredAgents, setFilteredAgents] = useState<Agent[]>(AGENTS);
-  const [liveStatus, setLiveStatus] = useState<Record<number, number>>({});
-  const [riskScores, setRiskScores] = useState<Record<number, number>>({});
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(() => window.localStorage.getItem("analytics-enabled") === "true");
-
-  useEffect(() => {
-    // Initialize risk scores on mount
-    const newRiskScores: Record<number, number> = {};
-    AGENTS.forEach((agent) => {
-      newRiskScores[agent.id] = Math.floor(Math.random() * 80) + 10;
-    });
-    setRiskScores(newRiskScores);
-
-    // Listen for live alerts via SSE
-    const es = new EventSource("/api/alerts");
-    es.onmessage = (e) => {
-      const { agentId, delta } = JSON.parse(e.data);
-      setLiveStatus((prev) => ({ ...prev, [agentId]: Math.max(0, (prev[agentId] ?? 0) + delta) }));
-      setRiskScores((prev) => ({ ...prev, [agentId]: Math.min(100, Math.max(0, (prev[agentId] ?? 0) + delta * 3)) }));
-    };
-    // Log page view
-    logEvent("page_view");
-    return () => es.close();
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem("analytics-enabled", analyticsEnabled ? "true" : "false");
-  }, [analyticsEnabled]);
-
-  const handleFilter = useCallback((filtered: Agent[], filterData?: any) => {
-    setFilteredAgents(filtered);
-    if (analyticsEnabled) logEvent("filter_change", filterData);
-  }, [analyticsEnabled]);
-
-  // Analytics toggle UI
-  const AnalyticsToggle = () => (
-    <div className="flex items-center gap-2 mb-2">
-      <label htmlFor="analytics-toggle" className="text-sm">Analytics</label>
-      <input
-        id="analytics-toggle"
-        type="checkbox"
-        checked={analyticsEnabled}
-        onChange={e => setAnalyticsEnabled(e.target.checked)}
-        aria-label="Toggle analytics event logging"
-      />
-    </div>
-  );
+  useEffect(() => { load(); }, [query]);
 
   return (
-    <Layout>
-      <Hero />
-      <section id="agents" className="container mx-auto px-4 sm:px-6 py-8">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-          <aside className="lg:col-span-3">
-            <FilterBar agents={AGENTS} onFilter={handleFilter} />
-          </aside>
-          <main className="lg:col-span-9">
-            <AgentGrid
-              agents={filteredAgents}
-              liveStatus={liveStatus}
-              riskScores={riskScores}
-            />
-          </main>
+    <div className="p-6 space-y-4">
+      <div className="flex gap-2 mb-3">
+        <button onClick={() => addAgents(24).then(load)} className="px-3 py-1 rounded-xl border">Add 24</button>
+        <button onClick={() => scaleAgents(100).then(load)} className="px-3 py-1 rounded-xl border">Scale to 100</button>
+        <button onClick={() => { fetch('/api/agents', { method: 'DELETE' }).then(load); }} className="px-3 py-1 rounded-xl border">Reset</button>
+      </div>
+      <input className="w-full px-3 py-2 rounded-2xl border" placeholder="Search agents, teams, skills, location…" value={query} onChange={(e) => setQuery(e.target.value)} />
+      {loading ? <p>Loading…</p> : <PaginatedGrid agents={agents} onSelect={setSelected} />}
+      {selected && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+          <div className="bg-white rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-semibold">{selected.name}</h3>
+            <p className="text-sm text-muted-foreground">{selected.team} • {selected.role} • {selected.group}</p>
+            <p className="mt-2 text-sm">Skills: {selected.skills.join(', ')}</p>
+            <p className="mt-2 text-sm">Risk: {selected.risk}%</p>
+            <button className="mt-4 px-4 py-2 rounded-xl border" onClick={() => setSelected(null)}>Close</button>
+          </div>
         </div>
-      </section>
-      <section id="chat" className="container mx-auto px-4 sm:px-6 pb-8">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ask your AI Agent
-          </h2>
-          <AnalyticsToggle />
-          <Suspense fallback={<div>Loading chat…</div>}>
-            <AiChat analyticsEnabled={analyticsEnabled} logEvent={logEvent} />
-          </Suspense>
-        </div>
-      </section>
-    </Layout>
+      )}
+    </div>
   );
-};
-
-export default App;
+}

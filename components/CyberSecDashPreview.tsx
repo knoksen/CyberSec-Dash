@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer } from "recharts";
 import { ShieldCheck, AlertTriangle, Search, Filter, Send, Bot, Users, Activity, Zap } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,7 +66,7 @@ function Stat({ icon: Icon, label, value }: any) {
 
 function FilterBar({ onFilter }: { onFilter: (q: string) => void }) {
 	const [q, setQ] = useState("");
-	useEffect(() => { onFilter(q); }, [q, onFilter]);
+	useEffect(() => { onFilter(q); }, [q]);
 	return (
 		<div className="flex items-center gap-2">
 			<div className="relative flex-1">
@@ -138,18 +138,18 @@ function MiniChart({ data }: { data: { t: number; value: number }[] }) {
 function ChatBox() {
 	const [input, setInput] = useState("");
 	const [msgs, setMsgs] = useState<{ role: "user" | "bot"; text: string; id: string }[]>([
-		{ role: "bot", text: "Hi! Ask me about agent risk or recent alerts.", id: window.crypto.randomUUID() },
+		{ role: "bot", text: "Hi! Ask me about agent risk or recent alerts.", id: crypto.randomUUID() },
 	]);
 	const listRef = useRef<HTMLDivElement>(null);
 	useEffect(() => { listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }); }, [msgs]);
 
 	const send = async () => {
 		if (!input.trim()) return;
-		const userMsg = { role: "user" as const, text: input.trim(), id: window.crypto.randomUUID() };
+		const userMsg = { role: "user" as const, text: input.trim(), id: crypto.randomUUID() };
 		setMsgs((m) => [...m, userMsg]);
 		setInput("");
 		// Mock streaming reply
-		const replyId = window.crypto.randomUUID();
+		const replyId = crypto.randomUUID();
 		setMsgs((m) => [...m, { role: "bot", text: "", id: replyId }]);
 		const chunks = ["Analyzing signals…", "Correlating alerts…", "Most risk: Agent‑3 (82%)."];
 		for (const c of chunks) {
@@ -194,7 +194,7 @@ export default function CyberSecDashPreview() {
 			const sev = Math.random() < 0.15 ? "high" : Math.random() < 0.5 ? "med" : "low";
 			setAlerts((arr) => [
 				...arr.slice(-6),
-				{ id: window.crypto.randomUUID(), text: `${pick.name} anomaly in ${pick.group} group`, sev },
+				{ id: crypto.randomUUID(), text: `${pick.name} anomaly in ${pick.group} group`, sev },
 			]);
 			// update chart
 			setSeries((s) => {
@@ -203,7 +203,7 @@ export default function CyberSecDashPreview() {
 			});
 		}, 1500);
 		return () => clearInterval(timer);
-	}, [agents]);
+	}, []);
 
 	const filtered = useMemo(() => {
 		const q = query.trim().toLowerCase();
