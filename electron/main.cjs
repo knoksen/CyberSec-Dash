@@ -212,6 +212,16 @@ app.whenReady().then(() => {
   ipcMain.handle('get-pending-deep-link', () => {
     try { return PENDING_DEEP_LINKS.shift() || null; } catch { return null; }
   });
+  ipcMain.handle('check-for-updates', async () => {
+    if (!app.isPackaged || !autoUpdater) return { ok: false };
+    try {
+      await autoUpdater.checkForUpdates();
+      return { ok: true };
+    } catch (e) {
+      logError('ipc check-for-updates failed', e);
+      return { ok: false };
+    }
+  });
 
   // Create system tray
   try {

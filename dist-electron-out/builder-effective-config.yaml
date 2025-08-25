@@ -16,7 +16,11 @@ files:
       - LICENSE.txt
 asar: true
 compression: maximum
-publish: null
+publish:
+  - provider: github
+    owner: knoksen
+    repo: CyberSec-Dash
+    releaseType: draft
 win:
   target:
     - target: nsis

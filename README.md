@@ -75,3 +75,24 @@ Note: Packaged server sets basic security headers (CSP, X-Frame-Options, etc.). 
 - The app registers a custom protocol `cyberdash://` for deep links.
 - In packaged builds, you can test by running `cyberdash://open?tab=alerts` from Win+R or a browser.
 - Renderer can poll `window.api.getPendingDeepLink()` on launch to process queued links.
+
+### Code signing (Windows)
+
+To reduce SmartScreen warnings and enable seamless updates, sign your app:
+
+1. Obtain a code-signing certificate (EV or OV).
+2. Export to a PFX or host a base64-encoded file in a secure secret.
+3. For local builds, set environment variables before packaging:
+
+```powershell
+$env:CSC_LINK="file://C:/path/to/cert.pfx"; $env:CSC_KEY_PASSWORD="<password>"; npm run dist:win
+```
+
+1. For GitHub Actions, set `CSC_LINK` and `CSC_KEY_PASSWORD` secrets (or use the Windows cert store via `WIN_CSC_LINK`).
+
+### Publishing releases
+
+- A workflow at `.github/workflows/release.yml` builds and publishes on tag push (e.g., `v0.1.0`).
+- Set `GH_TOKEN` in repo secrets. On tag push, artifacts are uploaded to a draft GitHub Release.
+- In-app: you can use the footer “Check for Updates” button (Electron builds) to trigger a manual check.
+- Diagnostics: call `window.api.copyDiagnostics()` to copy version and log location to clipboard.

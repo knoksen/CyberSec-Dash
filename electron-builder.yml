@@ -15,11 +15,10 @@ files:
 asar: true
 compression: maximum
 publish:
-  # Configure when ready to publish releases (optional)
-  # - provider: github
-  #   owner: knoksen
-  #   repo: CyberSec-Dash
-  #   releaseType: draft
+  - provider: github
+    owner: knoksen
+    repo: CyberSec-Dash
+    releaseType: draft
 win:
   target:
     - target: nsis

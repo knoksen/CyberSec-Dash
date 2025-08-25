@@ -14,6 +14,9 @@ declare global {
       }>;
   getLogPath: () => Promise<{ directory: string | null; file: string | null }>;
   getPendingDeepLink: () => Promise<string | null>;
+  onDeepLink: (handler: (url: string) => void) => () => void;
+  checkForUpdates: () => Promise<{ ok: boolean }>;
+  copyDiagnostics: () => Promise<{ ok: boolean }>;
     };
   }
 }

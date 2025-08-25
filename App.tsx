@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "./components/Layout";
 import Hero from "./components/Hero";
 import FilterBar from "./components/FilterBar";
@@ -34,6 +34,36 @@ const App: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Deep-link handling: cyberdash://open?tab=agents|chat
+  const chatSectionRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const handleUrl = (url: string | null) => {
+      if (!url) return;
+      try {
+        const u = new URL(url);
+        const tab = u.searchParams.get("tab");
+        if (tab === "agents") {
+          document.querySelector('#agents')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (tab === "chat") {
+          document.querySelector('#chat')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Try to focus first input/textarea within chat section
+          setTimeout(() => {
+            const el = document.querySelector('#chat input, #chat textarea') as HTMLElement | null;
+            el?.focus();
+          }, 150);
+        }
+      } catch {
+        // ignore invalid deep link
+      }
+    };
+
+    // One-time poll for any pending deep link on startup
+    window.api?.getPendingDeepLink?.().then(handleUrl);
+    // Subscribe for future deep link events
+    const off = window.api?.onDeepLink?.((url: string) => handleUrl(url));
+    return () => { try { off && off(); } catch { /* ignore */ } };
+  }, []);
+
   const handleFilter = useCallback((filtered: Agent[]) => {
     setFilteredAgents(filtered);
   }, []);
@@ -55,7 +85,7 @@ const App: React.FC = () => {
           </main>
         </div>
       </section>
-      <section id="chat" className="container mx-auto px-4 sm:px-6 pb-8">
+      <section id="chat" ref={chatSectionRef} className="container mx-auto px-4 sm:px-6 pb-8">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Ask your AI Agent
