@@ -1,0 +1,16 @@
+# All supported funding platforms using 'knoksen'
+
+github: [knoksen]                # GitHub Sponsors
+patreon: knoksen                 # Patreon
+open_collective: knoksen         # Open Collective
+ko_fi: knoksen                   # Ko-fi
+tidelift: npm/knoksen            # Tidelift (example for npm package)
+community_bridge: knoksen        # Community Bridge
+liberapay: knoksen               # Liberapay
+issuehunt: knoksen               # IssueHunt
+otechie: knoksen                 # Otechie
+custom: 
+  - "https://buymeacoffee.com/knoksen"
+  - "https://paypal.me/knoksen"
+  - "https://knoksen.com/donate"
+
