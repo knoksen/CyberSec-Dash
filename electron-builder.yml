@@ -1,0 +1,24 @@
+appId: com.knoksen.cyberagentsdashboard
+productName: Cyber Agents Dashboard
+directories:
+  output: dist-electron
+files:
+  - dist/**
+  - electron/**
+  - index.html
+  - package.json
+asar: true
+compression: maximum
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: "${productName} Setup ${version}.${ext}"
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "CyberSec Dash"

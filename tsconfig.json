@@ -27,9 +27,6 @@
       ]
     },
     "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "types": [
-      "vitest"
-    ]
+    "noEmit": true
   }
 }

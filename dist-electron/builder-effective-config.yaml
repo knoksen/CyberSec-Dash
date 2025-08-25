@@ -1,0 +1,21 @@
+directories:
+  output: dist-electron
+  buildResources: build
+appId: com.knoksen.cyberagentsdashboard
+productName: Cyber Agents Dashboard
+files:
+  - filter:
+      - dist/**
+      - electron/**
+      - index.html
+      - package.json
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+electronVersion: 37.3.1
