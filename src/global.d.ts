@@ -12,6 +12,8 @@ declare global {
         chrome?: string;
         node?: string;
       }>;
+  getLogPath: () => Promise<{ directory: string | null; file: string | null }>;
+  getPendingDeepLink: () => Promise<string | null>;
     };
   }
 }

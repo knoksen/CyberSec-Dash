@@ -3,17 +3,26 @@ directories:
   buildResources: build
 appId: com.knoksen.cyberagentsdashboard
 productName: Cyber Agents Dashboard
+protocols:
+  - name: CyberDash Protocol
+    schemes:
+      - cyberdash
 files:
   - filter:
       - dist/**
       - electron/**
       - index.html
       - package.json
+      - LICENSE.txt
 asar: true
 compression: maximum
+publish: null
 win:
   target:
     - target: nsis
+      arch:
+        - x64
+    - target: portable
       arch:
         - x64
   artifactName: ${productName} Setup ${version}.${ext}
@@ -25,4 +34,5 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: CyberSec Dash
+  license: LICENSE.txt
 electronVersion: 37.3.1

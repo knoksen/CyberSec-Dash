@@ -2,16 +2,30 @@ appId: com.knoksen.cyberagentsdashboard
 productName: Cyber Agents Dashboard
 directories:
   output: dist-electron-out
+protocols:
+  - name: CyberDash Protocol
+    schemes:
+      - cyberdash
 files:
   - dist/**
   - electron/**
   - index.html
   - package.json
+  - LICENSE.txt
 asar: true
 compression: maximum
+publish:
+  # Configure when ready to publish releases (optional)
+  # - provider: github
+  #   owner: knoksen
+  #   repo: CyberSec-Dash
+  #   releaseType: draft
 win:
   target:
     - target: nsis
+      arch:
+        - x64
+    - target: portable
       arch:
         - x64
   artifactName: "${productName} Setup ${version}.${ext}"
@@ -23,3 +37,4 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: "CyberSec Dash"
+  license: LICENSE.txt

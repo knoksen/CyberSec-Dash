@@ -35,6 +35,29 @@ function createServer(rootDir) {
   const app = express();
   app.use(express.json());
 
+  // Basic security headers suitable for a local Electron-served app
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    // Conservative CSP for local assets; loosen if you add remote resources
+    res.setHeader(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: blob:",
+        "font-src 'self' data:",
+        "connect-src 'self'",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join('; ')
+    );
+    next();
+  });
+
   // Simple API: /api/agents
   app.options('/api/agents', (_req, res) => {
     res.set({

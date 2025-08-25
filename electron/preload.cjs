@@ -12,4 +12,18 @@ contextBridge.exposeInMainWorld('api', {
       return { name: 'Cyber Agents Dashboard', version: '0.0.0', electron: process.versions.electron };
     }
   },
+  getLogPath: async () => {
+    try {
+      return await ipcRenderer.invoke('get-log-path');
+    } catch {
+      return { directory: null, file: null };
+    }
+  },
+  getPendingDeepLink: async () => {
+    try {
+      return await ipcRenderer.invoke('get-pending-deep-link');
+    } catch {
+      return null;
+    }
+  },
 });
