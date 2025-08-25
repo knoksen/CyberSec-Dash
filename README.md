@@ -1,6 +1,22 @@
 # Run and deploy your AI Studio app
 
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/knoksen/CyberSec-Dash)
+[![Open in VS Code Web](https://img.shields.io/badge/Open%20in-VS%20Code%20Web-007ACC?logo=visualstudiocode)](https://vscode.dev/github/knoksen/CyberSec-Dash)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/knoksen/CyberSec-Dash)
+[![Release (Windows)](https://github.com/knoksen/CyberSec-Dash/actions/workflows/release.yml/badge.svg)](https://github.com/knoksen/CyberSec-Dash/actions/workflows/release.yml)
+
 This contains everything you need to run your app locally.
+
+## Quick Launch (GitHub)
+
+- Open in Codespaces (browser dev container):
+   [codespaces.new/knoksen/CyberSec-Dash](https://codespaces.new/knoksen/CyberSec-Dash)
+- Open in VS Code (web):
+   [vscode.dev/github/knoksen/CyberSec-Dash](https://vscode.dev/github/knoksen/CyberSec-Dash)
+- Open in Gitpod:
+   [gitpod.io/#…](https://gitpod.io/#https://github.com/knoksen/CyberSec-Dash)
+- Open in GitHub Desktop:
+   [Open in GitHub Desktop](x-github-client://openRepo/https://github.com/knoksen/CyberSec-Dash)
 
 ## Run Locally
 
