@@ -17,6 +17,21 @@ This contains everything you need to run your app locally.
    [gitpod.io/#…](https://gitpod.io/#https://github.com/knoksen/CyberSec-Dash)
 - Open in GitHub Desktop:
    [Open in GitHub Desktop](x-github-client://openRepo/https://github.com/knoksen/CyberSec-Dash)
+- Open in VS Code Dev Containers (local):
+   [Open in Dev Containers](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https%3A%2F%2Fgithub.com%2Fknoksen%2FCyberSec-Dash)
+
+Quick start with GitHub CLI:
+
+```powershell
+# Clone and open in VS Code
+gh repo clone knoksen/CyberSec-Dash
+cd CyberSec-Dash
+code .
+
+# Optional: open in a Dev Container (VS Code Desktop)
+# Requires "Dev Containers" extension installed
+"vscode://ms-vscode-remote.remote-containers.openFolder?path=${PWD}"
+```
 
 ## Run Locally
 
