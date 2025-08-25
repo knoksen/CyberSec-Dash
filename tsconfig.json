@@ -9,12 +9,18 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "jsx": "react-jsx",
+    "types": [
+      "react/jsx-runtime",
+      "vitest"
+    ],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
-    "jsx": "react-jsx",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": [
         "./*"

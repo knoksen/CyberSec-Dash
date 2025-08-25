@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, AlertTriangle, Search, Filter, Send, Bot, Users, Activity, Zap } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer } from "recharts";
@@ -37,23 +37,29 @@ function Header({ onReset }: { onReset: () => void }) {
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<Button variant="outline" onClick={onReset} className="rounded-2xl"><Zap className="w-4 h-4 mr-2"/>Reset</Button>
+							<Button variant="outline" onClick={onReset} className="rounded-2xl"><Zap className="w-4 h-4 mr-2" />Reset</Button>
 						</TooltipTrigger>
 						<TooltipContent>Reset demo state</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
-				<Button className="rounded-2xl"><Bot className="w-4 h-4 mr-2"/>AI Assist</Button>
+				<Button className="rounded-2xl"><Bot className="w-4 h-4 mr-2" />AI Assist</Button>
 			</div>
 		</div>
 	);
 }
 
-function Stat({ icon: Icon, label, value }: any) {
+interface StatProps {
+	icon: React.ComponentType<{ className?: string }>;
+	label: string;
+	value: string | number;
+}
+
+function Stat({ icon: Icon, label, value }: StatProps) {
 	return (
 		<Card className="rounded-2xl">
 			<CardContent className="p-4">
 				<div className="flex items-center gap-3">
-					<div className="p-2 rounded-xl bg-gray-100"><Icon className="w-5 h-5"/></div>
+					<div className="p-2 rounded-xl bg-gray-100"><Icon className="w-5 h-5" /></div>
 					<div>
 						<div className="text-xs text-muted-foreground">{label}</div>
 						<div className="text-lg font-semibold">{value}</div>
@@ -70,15 +76,24 @@ function FilterBar({ onFilter }: { onFilter: (q: string) => void }) {
 	return (
 		<div className="flex items-center gap-2">
 			<div className="relative flex-1">
-				<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
-				<Input className="pl-9 rounded-2xl" placeholder="Search agents, teams..." value={q} onChange={(e) => setQ(e.target.value)} />
+				<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+				<Input className="pl-9 rounded-2xl" placeholder="Search agents, teams..." value={q} onChange={(e: ChangeEvent<HTMLInputElement>) => setQ(e.target.value)} />
 			</div>
-			<Button variant="outline" className="rounded-2xl"><Filter className="w-4 h-4 mr-2"/>Filters</Button>
+			<Button variant="outline" className="rounded-2xl"><Filter className="w-4 h-4 mr-2" />Filters</Button>
 		</div>
 	);
 }
 
-function AgentCard({ agent, onSelect }: { agent: any; onSelect: (a: any) => void }) {
+interface PreviewAgent {
+	id: number;
+	name: string;
+	team: string;
+	role: string;
+	group: string;
+	risk: number;
+}
+
+function AgentCard({ agent, onSelect }: { agent: PreviewAgent; onSelect: (a: PreviewAgent) => void }) {
 	const color = agent.risk > 75 ? "bg-red-500" : agent.risk > 50 ? "bg-amber-500" : "bg-emerald-500";
 	return (
 		<motion.div layout>
@@ -93,9 +108,9 @@ function AgentCard({ agent, onSelect }: { agent: any; onSelect: (a: any) => void
 					</div>
 					<div className="mt-3">
 						<div className="flex items-center justify-between text-xs mb-1"><span>Risk</span><span>{agent.risk}%</span></div>
-						<Progress value={agent.risk} className="h-2 rounded-full"/>
-						<div className="mt-2 h-1.5 rounded-full w-12"/>
-						<div className={`mt-2 h-1.5 rounded-full w-1/3 ${color}`}/>
+						<Progress value={agent.risk} className="h-2 rounded-full" />
+						<div className="mt-2 h-1.5 rounded-full w-12" />
+						<div className={`mt-2 h-1.5 rounded-full w-1/3 ${color}`} />
 					</div>
 				</CardContent>
 			</Card>
@@ -124,9 +139,9 @@ function MiniChart({ data }: { data: { t: number; value: number }[] }) {
 				<div className="text-xs text-muted-foreground mb-2">Alert volume (24h)</div>
 				<ResponsiveContainer width="100%" height="100%">
 					<LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-						<XAxis hide dataKey="t"/>
-						<YAxis hide/>
-						<RTooltip/>
+						<XAxis hide dataKey="t" />
+						<YAxis hide />
+						<RTooltip />
 						<Line type="monotone" dataKey="value" dot={false} strokeWidth={2} />
 					</LineChart>
 				</ResponsiveContainer>
@@ -170,7 +185,7 @@ function ChatBox() {
 				</div>
 				<div className="p-3 border-t flex items-center gap-2">
 					<Input placeholder="Ask the AI…" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} className="rounded-2xl" />
-					<Button onClick={send} className="rounded-2xl"><Send className="w-4 h-4"/></Button>
+					<Button onClick={send} className="rounded-2xl"><Send className="w-4 h-4" /></Button>
 				</div>
 			</CardContent>
 		</Card>
@@ -182,7 +197,7 @@ export default function CyberSecDashPreview() {
 	const [agents, setAgents] = useState(AGENTS);
 	const [query, setQuery] = useState("");
 	const [selected, setSelected] = useState<any | null>(null);
-	const [alerts, setAlerts] = useState<{ id: string; text: string; sev: "low"|"med"|"high" }[]>([]);
+	const [alerts, setAlerts] = useState<{ id: string; text: string; sev: "low" | "med" | "high" }[]>([]);
 
 	// Simulate live alerts + risk drift
 	useEffect(() => {
@@ -223,7 +238,7 @@ export default function CyberSecDashPreview() {
 				<Stat icon={Activity} label="Active agents" value={agents.length} />
 				<Stat icon={Users} label="High risk" value={high} />
 				<Stat icon={AlertTriangle} label="Medium risk" value={med} />
-				<Stat icon={ShieldCheck} label="Coverage" value={`${90 + Math.floor(Math.random()*10)}%`} />
+				<Stat icon={ShieldCheck} label="Coverage" value={`${90 + Math.floor(Math.random() * 10)}%`} />
 			</div>
 
 			<FilterBar onFilter={setQuery} />
@@ -238,7 +253,7 @@ export default function CyberSecDashPreview() {
 					<MiniChart data={series} />
 					<Card className="rounded-2xl">
 						<CardContent className="p-4 space-y-3">
-							<div className="flex items-center gap-2 text-sm font-medium"><AlertTriangle className="w-4 h-4 text-amber-500"/> Live alerts</div>
+							<div className="flex items-center gap-2 text-sm font-medium"><AlertTriangle className="w-4 h-4 text-amber-500" /> Live alerts</div>
 							<div className="space-y-2 max-h-44 overflow-auto pr-1">
 								<AnimatePresence>
 									{alerts.map((a) => (
