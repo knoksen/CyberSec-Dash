@@ -1,47 +1,70 @@
+import React, { useState, useEffect, useCallback } from "react";
+import Layout from "./components/Layout";
+import Hero from "./components/Hero";
+import FilterBar from "./components/FilterBar";
+import AgentGrid from "./components/AgentGrid";
+import AiChat from "./components/Chat";
+import { AGENTS } from "./constants";
+import { Agent } from "./types";
 
+const App: React.FC = () => {
+  const [filteredAgents, setFilteredAgents] = useState<Agent[]>(AGENTS);
+  const [liveStatus, setLiveStatus] = useState<Record<number, number>>({});
+  const [riskScores, setRiskScores] = useState<Record<number, number>>({});
 
-import React, { useEffect, useState } from "react";
-import { fetchAgents, addAgents, scaleAgents, type Agent } from "@/lib/api";
-import { PaginatedGrid } from "@/components/PaginatedGrid";
+  useEffect(() => {
+    // Simulate fetching risk scores on mount
+    const newRiskScores: Record<number, number> = {};
+    AGENTS.forEach((agent) => {
+      newRiskScores[agent.id] = Math.floor(Math.random() * 80) + 10; // Random score 10-90
+    });
+    setRiskScores(newRiskScores);
 
-export default function App() {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Agent | null>(null);
+    // Simulate polling for live alerts
+    const intervalId = setInterval(() => {
+      setLiveStatus((prevStatus) => {
+        const newStatus = { ...prevStatus };
+        const randomAgentId =
+          AGENTS[Math.floor(Math.random() * AGENTS.length)].id;
+        newStatus[randomAgentId] = (newStatus[randomAgentId] || 0) + 1;
+        return newStatus;
+      });
+    }, 5000); // New alert every 5 seconds
 
-  async function load() {
-    setLoading(true);
-    try {
-      const { items } = await fetchAgents(query ? { q: query } : undefined);
-      setAgents(items);
-    } finally {
-      setLoading(false);
-    }
-  }
+    return () => clearInterval(intervalId);
+  }, []);
 
-  useEffect(() => { load(); }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
+  const handleFilter = useCallback((filtered: Agent[]) => {
+    setFilteredAgents(filtered);
+  }, []);
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex gap-2 mb-3">
-        <button onClick={() => addAgents(24).then(load)} className="px-3 py-1 rounded-xl border">Add 24</button>
-        <button onClick={() => scaleAgents(100).then(load)} className="px-3 py-1 rounded-xl border">Scale to 100</button>
-        <button onClick={() => { fetch('/api/agents', { method: 'DELETE' }).then(load); }} className="px-3 py-1 rounded-xl border">Reset</button>
-      </div>
-      <input className="w-full px-3 py-2 rounded-2xl border" placeholder="Search agents, teams, skills, location…" value={query} onChange={(e) => setQuery(e.target.value)} />
-      {loading ? <p>Loading…</p> : <PaginatedGrid agents={agents} onSelect={setSelected} />}
-      {selected && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
-          <div className="bg-white rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-semibold">{selected.name}</h3>
-            <p className="text-sm text-muted-foreground">{selected.team} • {selected.role} • {selected.group}</p>
-            <p className="mt-2 text-sm">Skills: {selected.skills.join(', ')}</p>
-            <p className="mt-2 text-sm">Risk: {selected.risk}%</p>
-            <button className="mt-4 px-4 py-2 rounded-xl border" onClick={() => setSelected(null)}>Close</button>
-          </div>
+    <Layout>
+      <Hero />
+      <section id="agents" className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+          <aside className="lg:col-span-3">
+            <FilterBar agents={AGENTS} onFilter={handleFilter} />
+          </aside>
+          <main className="lg:col-span-9">
+            <AgentGrid
+              agents={filteredAgents}
+              liveStatus={liveStatus}
+              riskScores={riskScores}
+            />
+          </main>
         </div>
-      )}
-    </div>
+      </section>
+      <section id="chat" className="container mx-auto px-4 sm:px-6 pb-8">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Ask your AI Agent
+          </h2>
+          <AiChat />
+        </div>
+      </section>
+    </Layout>
   );
-}
+};
+
+export default App;

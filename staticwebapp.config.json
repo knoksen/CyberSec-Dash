@@ -7,13 +7,5 @@
         "x-content-type-options": "nosniff",
         "referrer-policy": "no-referrer",
         "permissions-policy": "camera=(), microphone=(), geolocation=()"
-    },
-    "routes": [
-        {
-            "route": "/api/*",
-            "allowedRoles": [
-                "anonymous"
-            ]
-        }
-    ]
+    }
 }

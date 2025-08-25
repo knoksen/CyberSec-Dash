@@ -4,7 +4,7 @@ import { Agent } from "../types";
 
 interface FilterBarProps {
   agents: Agent[];
-  onFilter: (filtered: Agent[], filterData?: any) => void;
+  onFilter: (filtered: Agent[]) => void;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ agents, onFilter }) => {
@@ -14,26 +14,6 @@ const FilterBar: React.FC<FilterBarProps> = ({ agents, onFilter }) => {
   const [group, setGroup] = useState("All");
   const [scope, setScope] = useState("All");
 
-  // Restore filters from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("filters");
-    if (saved) {
-      try {
-        const { query, role, team, group, scope } = JSON.parse(saved);
-        if (query) setQuery(query);
-        if (role) setRole(role);
-        if (team) setTeam(team);
-        if (group) setGroup(group);
-        if (scope) setScope(scope);
-      } catch {}
-    }
-  }, []);
-
-  // Persist filters to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("filters", JSON.stringify({ query, role, team, group, scope }));
-  }, [query, role, team, group, scope]);
-
   // Use a ref to hold the onFilter callback. This allows us to call the latest
   // version of the function from inside useEffect without adding it to the
   // dependency array, which prevents a common infinite re-render loop.
@@ -41,16 +21,16 @@ const FilterBar: React.FC<FilterBarProps> = ({ agents, onFilter }) => {
   onFilterRef.current = onFilter;
 
   useEffect(() => {
-    const filtered = agents.filter(
-      (a) =>
-        a.name.toLowerCase().includes(query.toLowerCase()) &&
-        (role === "All" || a.role === role) &&
-        (team === "All" || a.team === team) &&
-        (group === "All" || a.group === group) &&
-        (scope === "All" || a.scope === scope)
+    onFilterRef.current(
+      agents.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query.toLowerCase()) &&
+          (role === "All" || a.role === role) &&
+          (team === "All" || a.team === team) &&
+          (group === "All" || a.group === group) &&
+          (scope === "All" || a.scope === scope)
+      )
     );
-    const filterData = { query, role, team, group, scope };
-    onFilterRef.current(filtered, filterData);
   }, [query, role, team, group, scope, agents]);
 
   const roles: string[] = [
