@@ -50,5 +50,7 @@ jobs:
           name: windows-artifacts-${{ github.ref_name }}
           path: |
             dist-electron-out/**/*.exe
+            dist-electron-out/**/*.blockmap
+            dist-electron-out/latest.yml
             dist-electron-out/**/*.7z
             dist-electron-out/**/builder-effective-config.yaml
