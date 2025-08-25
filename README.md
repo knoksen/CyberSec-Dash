@@ -28,9 +28,9 @@ Build and package a Windows installer and a portable exe:
 npm run dist:win
 ```
 
-Artifacts will be in `dist-electron/`:
+Artifacts will be in `dist-electron-out/`:
 
-- `win-unpacked/electron.exe` — portable app
+- `win-unpacked/Cyber Agents Dashboard.exe` — portable app
 - `Cyber Agents Dashboard Setup <version>.exe` — installer
 
 ### App icon
@@ -41,3 +41,8 @@ Artifacts will be in `dist-electron/`:
 ```powershell
 npm run dist:win
 ```
+
+### About dialog and preload API
+
+- Help > About shows app and runtime versions.
+- Renderer can read app info via `window.api.getAppInfo()` which returns `{ name, version, electron, chrome, node }`.

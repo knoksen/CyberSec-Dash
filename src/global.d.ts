@@ -5,6 +5,13 @@ declare global {
     api: {
       getVersion: () => string;
       ping: () => string;
+      getAppInfo: () => Promise<{
+        name: string;
+        version: string;
+        electron: string;
+        chrome?: string;
+        node?: string;
+      }>;
     };
   }
 }
