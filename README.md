@@ -92,7 +92,15 @@ $env:CSC_LINK="file://C:/path/to/cert.pfx"; $env:CSC_KEY_PASSWORD="<password>"; 
 
 ### Publishing releases
 
-- A workflow at `.github/workflows/release.yml` builds and publishes on tag push (e.g., `v0.1.0`).
-- Set `GH_TOKEN` in repo secrets. On tag push, artifacts are uploaded to a draft GitHub Release.
-- In-app: you can use the footer “Check for Updates” button (Electron builds) to trigger a manual check.
+- Push a tag like `v0.1.0` to trigger `.github/workflows/release.yml`.
+- The workflow uses the built-in `GITHUB_TOKEN` to create a draft GitHub Release and upload artifacts.
+- Optional signing: add `CSC_LINK` and `CSC_KEY_PASSWORD` repo secrets to sign Windows builds.
+- In-app: use the footer “Check for Updates” button (Electron builds) to trigger a manual check.
 - Diagnostics: call `window.api.copyDiagnostics()` to copy version and log location to clipboard.
+
+Release checklist:
+
+- [ ] Set `build/icon.ico` (256x256) and rebuild
+- [ ] Configure signing (`CSC_LINK`, `CSC_KEY_PASSWORD`) for CI
+- [ ] Update version in `package.json` (e.g., 0.1.0)
+- [ ] Push tag `v0.1.0` to publish draft release

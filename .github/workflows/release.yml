@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-publish-windows:
     runs-on: windows-latest
+    permissions:
+      contents: write
+      packages: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,6 +22,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Sync version from tag
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart('v')
+          Write-Host "Setting package.json version to $ver"
+          npm version --no-git-tag-version $ver
 
       - name: Build renderer
         run: npm run build
@@ -32,3 +42,13 @@ jobs:
           # Or use certificate from Windows cert store
           # WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
         run: npx electron-builder --win --publish always --config electron-builder.yml
+
+      - name: Upload build artifacts (workflow run)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts-${{ github.ref_name }}
+          path: |
+            dist-electron-out/**/*.exe
+            dist-electron-out/**/*.7z
+            dist-electron-out/**/builder-effective-config.yaml

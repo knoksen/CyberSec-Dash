@@ -1,7 +1,7 @@
 {
   "name": "cyber-agents-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cyber Agents Dashboard — a desktop Electron app for exploring and managing cyber security agents.",
   "author": {
     "name": "knoksen"
@@ -17,6 +17,8 @@
     "preview": "vite preview",
     "dist:win": "vite build && electron-builder --win --publish never --config electron-builder.yml",
     "dist:win:publish": "vite build && electron-builder --win --publish always --config electron-builder.yml",
+    "release:tag": "git tag v%npm_package_version%",
+    "release:tag:push": "git push origin v%npm_package_version%",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
@@ -29,6 +31,7 @@
   },
   "dependencies": {
     "@google/genai": "0.14.0",
+    "electron-updater": "^6.3.9",
     "express": "^4.19.2",
     "framer-motion": "11.3.19",
     "lucide-react": "0.417.0",
@@ -51,7 +54,6 @@
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.1.2",
     "electron": "^37.3.1",
-    "electron-updater": "^6.3.9",
     "electron-builder": "^26.0.12",
     "eslint": "^9.11.0",
     "eslint-plugin-import": "^2.30.0",
@@ -67,5 +69,13 @@
     "vite": "^5.4.19",
     "vitest": "^2.1.9",
     "wait-on": "^8.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knoksen/CyberSec-Dash.git"
+  },
+  "bugs": {
+    "url": "https://github.com/knoksen/CyberSec-Dash/issues"
+  },
+  "homepage": "https://github.com/knoksen/CyberSec-Dash#readme"
 }
