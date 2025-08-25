@@ -82,4 +82,24 @@ export default [
 			ecmaVersion: 2021,
 		},
 	},
+	{
+		files: ['**/*.d.ts'],
+		rules: {
+			'no-unused-vars': 'off',
+			'@typescript-eslint/no-unused-vars': 'off',
+		},
+	},
+	{
+		files: ['electron/**/*.cjs'],
+		languageOptions: {
+			globals: {
+				__dirname: 'readonly',
+				process: 'readonly',
+				console: 'readonly',
+				module: 'readonly',
+				require: 'readonly',
+			},
+			ecmaVersion: 2021,
+		},
+	},
 ];

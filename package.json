@@ -10,7 +10,7 @@
     "electron": "electron electron/main.cjs",
     "build": "vite build",
     "preview": "vite preview",
-    "dist:win": "rimraf dist-electron && vite build && electron-builder --win --publish never --config electron-builder.yml",
+    "dist:win": "vite build && electron-builder --win --publish never --config electron-builder.yml",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@google/genai": "0.14.0",
+    "express": "^4.19.2",
     "framer-motion": "11.3.19",
     "lucide-react": "0.417.0",
     "react": "18.3.1",

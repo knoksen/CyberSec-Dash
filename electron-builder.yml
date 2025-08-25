@@ -1,7 +1,7 @@
 appId: com.knoksen.cyberagentsdashboard
 productName: Cyber Agents Dashboard
 directories:
-  output: dist-electron
+  output: dist-electron-out
 files:
   - dist/**
   - electron/**
@@ -15,6 +15,7 @@ win:
       arch:
         - x64
   artifactName: "${productName} Setup ${version}.${ext}"
+  icon: build/icon.ico
 nsis:
   oneClick: true
   perMachine: false

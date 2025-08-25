@@ -32,3 +32,12 @@ Artifacts will be in `dist-electron/`:
 
 - `win-unpacked/electron.exe` — portable app
 - `Cyber Agents Dashboard Setup <version>.exe` — installer
+
+### App icon
+
+1. Add a 256x256 `.ico` at `build/icon.ico`.
+2. Rebuild the installer:
+
+```powershell
+npm run dist:win
+```
