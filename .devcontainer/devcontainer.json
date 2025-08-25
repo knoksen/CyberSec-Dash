@@ -8,6 +8,7 @@
         }
     },
     "postCreateCommand": "npm ci && npx playwright install --with-deps",
+    "postStartCommand": "npm run dev",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -19,5 +20,11 @@
     },
     "forwardPorts": [
         5173
-    ]
+    ],
+    "portsAttributes": {
+        "5173": {
+            "label": "Vite Dev Server",
+            "onAutoForward": "openPreview"
+        }
+    }
 }
